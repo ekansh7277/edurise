@@ -36,6 +36,17 @@ async function handleFormSubmit(e) {
   await submitFormData(form, data);
 }
 
+function normalizeFormData(data) {
+  return {
+    fullName: data.fullName || data.fullname || data['full-name'] || data.name || data['your-name'] || '',
+    contactNumber: data.contactNumber || data.contactnumber || data['contact-number'] || data.phone || data.tel || data['your-tel'] || '',
+    city: data.city || data.location || data['your-city'] || '',
+    interestedCourse: data.interestedCourse || data.interestedcourse || data.course || data['interested-course'] || data['menu-447'] || '',
+    email: data.email || data['your-email'] || '',
+    message: data.message || data.textarea || data['your-message'] || ''
+  };
+}
+
 async function handleCallbackFormSubmit(container, inputs) {
   const data = {};
   
@@ -62,15 +73,19 @@ async function handleCallbackFormSubmit(container, inputs) {
 }
 
 async function submitFormData(formElement, data) {
-  if (!data.fullName && !data.fullname) {
+  const normalizedData = normalizeFormData(data);
+  
+  if (!normalizedData.fullName) {
     showMessage(formElement, 'Please enter your full name', 'error');
     return;
   }
   
-  if (!data.contactNumber && !data.contactnumber) {
+  if (!normalizedData.contactNumber) {
     showMessage(formElement, 'Please enter your contact number', 'error');
     return;
   }
+
+  data = normalizedData;
 
   formElement.classList.add('form-loading');
   const submitBtn = formElement.querySelector('.cpw-submit-btn, button[type="submit"], input[type="submit"]');
